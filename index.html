@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idea Mixer — Creativity Lenses</title>
+<style>
+:root{--ink:#17213b;--blue:#1688ee;--purple:#8056d9;--yellow:#ffdf4f;--green:#19a85b}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(150deg,#d8f5ff,#f6edff 48%,#fff6c9)}
+.app{max-width:760px;margin:auto;padding:6px;min-height:100dvh;display:flex;flex-direction:column;gap:5px}
+.hero{overflow:hidden;border:2px solid white;border-radius:14px;padding:5px 8px;text-align:center;background:linear-gradient(135deg,#48c8ff,#8d76f5 60%,#ff9cc7);box-shadow:0 2px 5px #344b7a20}
+h1{margin:0;font-size:clamp(1.3rem,5vw,1.8rem);line-height:1.05;color:#fff;text-shadow:1px 2px 0 #263b6d}
+.tagline{display:inline-block;background:var(--yellow);border:1px solid #fff;border-radius:999px;padding:2px 7px;font-size:.65rem;font-weight:800}
+.cartoon{font-size:1rem;line-height:1;margin:1px}
+.panel{background:#ffffffed;border:1px solid white;border-radius:14px;padding:8px 10px;box-shadow:0 3px 8px #344b7a12}
+.label-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+h2{font-size:.98rem;margin:0 0 3px}
+.count{min-width:38px;text-align:center;border:1px solid #a5c9ff;border-radius:9px;background:#eff7ff;font-size:1.2rem;font-weight:900;padding:0 5px}
+input[type=range]{width:100%;accent-color:#ff5c52;margin:5px 0 0;cursor:pointer;height:18px}
+.ticks{display:flex;justify-content:space-between;padding:0 3px;color:#47516b;font-weight:750;font-size:.68rem}
+button{border:0;cursor:pointer;font:inherit;font-weight:850;touch-action:manipulation}
+.generate{width:100%;margin-top:6px;padding:8px 10px;border-radius:12px;color:white;font-size:.98rem;background:linear-gradient(#2bd16f,#07853e);box-shadow:0 3px 0 #086b35}
+.generate:disabled{opacity:.7;cursor:wait}
+.hint{color:#59637b;font-size:.68rem;margin:4px 0 0;text-align:center}
+.link-hint{margin:0;text-align:center;font-size:.65rem;color:#4c5873}
+.ideas{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.idea{min-width:0;padding:7px 4px;border:1px solid white;border-radius:10px;text-align:center;box-shadow:0 2px 5px #344b7a12;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow-wrap:anywhere}
+.idea:nth-child(4n+1){background:#d9f4ff}.idea:nth-child(4n+2){background:#ddffdf}.idea:nth-child(4n+3){background:#fff4c7}.idea:nth-child(4n){background:#f5e2ff}
+.emoji{font-size:1.5rem;line-height:1.05}
+.field{font-size:.92rem;line-height:1.15;font-weight:950;margin:4px 0;overflow-wrap:anywhere}
+.field a{color:#0757b7;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:2px}
+.field a:focus-visible{outline:2px solid #0757b7;outline-offset:3px}
+.plus{font-size:.9rem;font-weight:1000;color:#d88b00;margin-top:2px}
+.combined{background:linear-gradient(135deg,#fff6b7,#fff);border:2px solid #ffda43;padding:7px 9px;display:flex;flex-direction:column;justify-content:center}
+.combined h2{display:inline-block;background:var(--yellow);border-radius:999px;padding:2px 8px;font-size:.9rem;margin:0}
+.result-emoji{font-size:1.4rem;text-align:center;margin:2px 0;line-height:1.05}
+.result-title{font-size:1.08rem;line-height:1.15;font-weight:950;text-align:center;margin:3px 0 5px;overflow-wrap:anywhere}
+.result-text{font-size:.9rem;line-height:1.28;margin:0;text-align:center}
+.actions{display:flex;gap:6px;margin-top:7px}
+.secondary{flex:1;border-radius:9px;padding:7px 6px;font-size:.8rem;background:#e9e7ff;color:#382a78}
+.technique-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:5px 0}
+.technique-btn{min-width:0;padding:7px 3px;border-radius:9px;background:#edf1ff;color:#3b3475;border:1px solid #d5dafa;font-size:.67rem;line-height:1.12}
+.technique-btn[aria-pressed="true"]{background:#7157d9;color:white;border-color:#7157d9;box-shadow:0 2px 0 #4935a2}
+.lens-result{background:#f7f3ff;border:1px solid #dcd0ff;border-radius:10px;padding:8px;font-size:.82rem;line-height:1.3}
+.lens-result strong{color:#4e3aa0;display:block;margin-bottom:3px}
+.brainstorm-row{display:flex;gap:6px}
+.brainstorm-row input{flex:1;min-width:0;border:1.5px solid #b7c9f4;border-radius:10px;padding:8px 9px;font:inherit;font-size:.88rem;background:#fff;color:var(--ink)}
+.brainstorm-row button{border-radius:10px;padding:7px 13px;background:linear-gradient(#48c8ff,#1688ee);color:white}
+.brainstorm-results{margin-top:7px;display:grid;grid-template-columns:1fr;gap:5px;max-height:38vh;overflow:auto}
+.brainstorm-results[hidden]{display:none}
+.brainstorm-option{background:#f0f5ff;border:1px solid #d4defb;border-radius:9px;padding:6px 8px;font-size:.8rem;line-height:1.25}
+.brainstorm-option strong{color:#4e3aa0}
+.footer{text-align:center;color:#68718a;font-size:.62rem;padding:0 2px}
+@media(max-width:430px){.app{padding:5px;gap:4px}.ideas{grid-template-columns:repeat(5,minmax(0,1fr))}.technique-buttons{grid-template-columns:repeat(3,minmax(0,1fr))}.technique-btn{font-size:.7rem;padding:7px 4px}.result-text{font-size:.86rem}}
+@media(max-height:700px){.cartoon{display:none}.hero{padding:3px 7px}.brainstorm-results{max-height:32vh}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="hero"><h1>Idea Mixer</h1><div class="tagline">Different fields. New possibilities.</div><div class="cartoon" aria-label="A thinking inventor">🧑‍🔬 💡 ⚙️</div></header>
+<section class="panel">
+<div class="label-row"><h2>🧪 How many ideas?</h2><output class="count" id="count" for="ideaCount">4</output></div>
+<input id="ideaCount" type="range" min="1" max="10" value="4" step="1" aria-label="Number of ideas to mix">
+<div class="ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+<button class="generate" id="generate">✨ Mix Concepts ✨</button><p class="hint">Technical concepts only — no people, places, organisations, or publications.</p>
+</section>
+<p class="link-hint">🔗 Tap any underlined concept to learn more</p>
+<section id="ideas" class="ideas" aria-live="polite"></section>
+<section class="panel combined">
+<div style="text-align:center"><h2>💥 Combined Idea</h2></div><div class="result-emoji" id="resultEmoji">🚀🌱📡</div><p class="result-title" id="resultTitle">Self-growing space habitats</p><p class="result-text" id="resultText">Combine different concepts to imagine a new useful invention.</p>
+<div class="actions"><button class="secondary" id="mixAgain">🔀 Mix again</button><button class="secondary" id="copyIdea">📋 Copy idea</button></div>
+</section>
+<section class="panel">
+<h2>🧠 Explore with a creativity lens</h2>
+<div class="technique-buttons" role="group" aria-label="Choose a creativity technique">
+<button class="technique-btn" data-technique="random" aria-pressed="true">🎲 Random Entry</button><button class="technique-btn" data-technique="analogy" aria-pressed="false">🔗 Analogy</button><button class="technique-btn" data-technique="provocation" aria-pressed="false">💥 Provocation</button><button class="technique-btn" data-technique="alternatives" aria-pressed="false">🔀 Alternatives</button><button class="technique-btn" data-technique="extract" aria-pressed="false">🧩 Extract a principle</button>
+</div><div class="lens-result" id="lensResult" aria-live="polite"><strong>🎲 Random Entry</strong>Take one concept that seems unrelated to the others. What feature, behaviour, or mechanism could it contribute to a new invention?</div>
+</section>
+<section class="panel">
+<h2>🧠 Brainstorm your own idea</h2><div class="brainstorm-row"><input id="customIdea" type="text" placeholder="Type your idea here…" aria-label="Your own idea"><button id="brainstormGo">Go</button></div><div class="brainstorm-results" id="brainstormResults" hidden></div>
+</section>
+<footer class="footer">Idea Mixer · Use curiosity to connect unrelated concepts.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id), slider=$("ideaCount");
+let currentIdeas=[],selectedTechnique="random";
+const bank=[
+["Drone","⚙️"],["Antenna","📡"],["Camera","📷"],["Sonar","🌊"],["Microphone","🎙️"],["Radar","📡"],["Lidar","🔦"],["Software-defined radio","📻"],["Phased array","📡"],["Piezoelectricity","⚡"],["Thermoelectric effect","🌡️"],["Shape-memory alloy","🧱"],["Metamaterial","🧱"],["Optical fibre","🔦"],["Neural network","🧠"],["Fuzzy logic","🧮"],["Fractal","🌀"],["Cellular automaton","🧮"],["Supercapacitor","🔋"],["Fuel cell","⚡"],["Solar cell","☀️"],["Heat pump","🌡️"],["Microcontroller","💻"],["Printed circuit board","🔌"],["Microelectromechanical system","⚙️"],["Gyroscope","🧭"],["Accelerometer","📐"],["Spectroscopy","🔬"],["Interferometry","〰️"],["Acoustic resonance","🎵"],["Magnetic induction","🧲"],["Wireless sensor network","📶"],["Edge computing","💻"],["Error-correcting code","🔢"],["Cryptography","🔐"],["Machine vision","👁️"],["Robotics","🤖"],["3D printing","🖨️"],["Electrolysis","🧪"],["Catalysis","⚗️"],["Aerogel","☁️"],["Graphene","🧱"],["Superconductivity","❄️"],["Plasma","⚡"],["Ultrasound","〰️"],["Thermal imaging","🌡️"],["Digital twin","🪞"],["Adaptive optics","🔭"],["Waveguide","〰️"],["Microfluidics","💧"],["Photovoltaics","☀️"],["Biomimicry","🌱"],["Swarm robotics","🐝"],["Autonomous navigation","🧭"],["Signal processing","📈"],["Noise cancellation","🎧"],["Battery management","🔋"],["Power electronics","⚡"],["Wireless power transfer","📶"],["Geiger counter","☢️"],["Optical sensor","🔦"],["Gas sensor","🫧"],["Water purification","💧"],["Desalination","🌊"],["Passive cooling","❄️"],["Regenerative braking","🚗"],["Magnetic levitation","🧲"],["Kinetic energy harvesting","⚙️"],["Smart materials","🧱"],["Termite mound ventilation","🐜"],["Gecko adhesion","🦎"],["Bird flight mechanics","🪽"],["Mycelium network","🍄"],["Photosynthesis","🌿"],["Seed dispersal","🌱"],["Ant colony optimization","🐜"],["Origami folding","📄"],["Tensegrity","🔺"],["Diffusion","🌀"],["Fluid dynamics","💧"],["Heat exchanger","🌡️"],["Optical communication","🔦"],["Radio propagation","📡"],["Antenna array","📡"],["Frequency hopping","📶"],["Spread spectrum","〰️"],["Software-defined networking","🌐"],["Computer vision","👁️"],["Reinforcement learning","🧠"],["Swarm intelligence","🐝"],["Bioelectricity","⚡"],["Bioluminescence","✨"],["Water harvesting","💧"],["Evaporative cooling","💨"],["Solar thermal collector","☀️"],["Wind turbine","🌬️"],["Hydraulic ram pump","💧"],["Acoustic levitation","🎵"],["Magnetic refrigeration","🧲"],["Shape optimization","📐"],["Topology optimization","🧮"],["Graph theory","🕸️"],["Quantum sensing","⚛️"],["Optical trapping","🔦"],["Microbial fuel cell","🦠"],["Enzyme catalysis","🧪"],["Self-healing material","🩹"]
+];
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderIdeas(items){$("ideas").innerHTML=items.map((x,i)=>'<article class="idea"><div class="emoji">'+x.emoji+'</div><div class="field"><a href="https://en.wikipedia.org/w/index.php?search='+encodeURIComponent(x.field)+'" target="_blank" rel="noopener noreferrer" aria-label="Learn more about '+esc(x.field)+' on Wikipedia">'+esc(x.field)+'</a></div>'+(i<items.length-1?'<div class="plus">＋</div>':'')+'</article>').join("")}
+function makeCombined(items){let names=items.map(x=>x.field);$("resultEmoji").textContent=items.map(x=>x.emoji).join(" ");$("resultTitle").textContent=names.join(" + ");$("resultText").textContent=items.length===1?'Use “'+names[0]+'” as inspiration. How could it solve a different practical problem? Sketch a small experiment to test one possibility.':'Creative challenge: find a useful connection between '+names.join(", ")+'. Look for a mechanism or principle in one concept that could solve a problem in another. Propose a low-cost prototype, explain why it might work, and identify the biggest uncertainty to test.'}
+const lenses={
+random:{title:"🎲 Random Entry",prompt:a=>a.length<2?'Treat “'+a[0].field+'” as a surprising starting point. What unexpected use could it have in a different field?':'Pick the concept that seems least related: '+a.map(x=>x.field).join(" + ")+'. What feature, behaviour, shape, or mechanism could it contribute to a new application?'},
+analogy:{title:"🔗 Analogy (Synectics)",prompt:a=>'Imagine these concepts as one system: '+a.map(x=>x.field).join(" + ")+'. What does one concept do that another could imitate? Turn the analogy into one testable design idea.'},
+provocation:{title:"💥 Provocation",prompt:a=>'Challenge a normal assumption about '+a.map(x=>x.field).join(" + ")+'. What if the usual limitation did not exist? Describe what would change, then find one small experiment to test the useful part.'},
+alternatives:{title:"🔀 Alternatives",prompt:a=>'For '+a.map(x=>x.field).join(" + ")+', generate three different combinations: one simple, one unusual, and one ambitious. Do not judge them yet; choose the one with the clearest first experiment.'},
+extract:{title:"🧩 Extract a principle",prompt:a=>'Look beneath these concepts: '+a.map(x=>x.field).join(" + ")+'. Identify a principle—feedback, branching, filtering, folding, redundancy, or energy transfer—that could be borrowed by another field.'}
+};
+function updateTechnique(key){selectedTechnique=key;document.querySelectorAll(".technique-btn").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.technique===key)));let t=lenses[key];$("lensResult").innerHTML='<strong>'+esc(t.title)+'</strong>'+esc(t.prompt(currentIdeas))}
+function generate(){let n=Number(slider.value);currentIdeas=shuffle(bank).slice(0,n).map(([field,emoji])=>({field,emoji}));renderIdeas(currentIdeas);makeCombined(currentIdeas);updateTechnique(selectedTechnique)}
+function brainstorm(raw){let idea=raw.trim();if(!idea){$("customIdea").focus();$("customIdea").placeholder="Please type an idea first…";return}let prompts=[
+["🎲 Random Entry",'Pair “'+idea+'” with an unrelated object or process. What feature could be borrowed to create a surprising use?'],
+["🔗 Analogy",'What natural system, machine, or everyday process behaves like “'+idea+'”? Borrow its operating principle and propose a test.'],
+["💥 Provocation",'Challenge an assumption about “'+idea+'”. What if it worked in the opposite way, needed no power, or had no moving parts? Test the most useful consequence.'],
+["🔀 Alternatives",'Invent three versions of “'+idea+'”: one practical, one unconventional, and one ambitious. Which has the cheapest first experiment?'],
+["🧩 Extract a principle",'Break “'+idea+'” into the job it performs and the principle that makes it work. Where else could that principle solve a problem?']
+];$("brainstormResults").innerHTML=prompts.map((p,i)=>'<article class="brainstorm-option"><strong>'+(i+1)+'. '+p[0]+':</strong> '+esc(p[1])+'</article>').join("");$("brainstormResults").hidden=false}
+slider.addEventListener("input",()=>$("count").textContent=slider.value);
+document.querySelectorAll(".technique-btn").forEach(b=>b.addEventListener("click",()=>updateTechnique(b.dataset.technique)));
+$("generate").addEventListener("click",generate);$("mixAgain").addEventListener("click",generate);
+$("brainstormGo").addEventListener("click",()=>brainstorm($("customIdea").value));$("customIdea").addEventListener("keydown",e=>{if(e.key==="Enter")brainstorm($("customIdea").value)});
+$("copyIdea").addEventListener("click",async()=>{let text=$("resultTitle").textContent+"\n\n"+$("resultText").textContent+"\n\nIdeas: "+currentIdeas.map(x=>x.field).join(" + ");try{await navigator.clipboard.writeText(text)}catch{let a=document.createElement("textarea");a.value=text;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}$("copyIdea").textContent="✅ Copied!";setTimeout(()=>$("copyIdea").textContent="📋 Copy idea",1500)});
+generate();
+</script>
+</body>
+</html>
